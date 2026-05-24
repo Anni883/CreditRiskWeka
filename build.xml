@@ -1,0 +1,30 @@
+package edu.creditrisk;
+
+import weka.clusterers.SimpleKMeans;
+import weka.core.Instances;
+import weka.core.Instance;
+
+public class ClusterRunner {
+
+    public static void runKMeans(Instances data, int k) throws Exception {
+        Instances clusterData = new Instances(data);
+        if (clusterData.classIndex() != -1) clusterData.setClassIndex(-1);
+
+        SimpleKMeans kmeans = new SimpleKMeans();
+        kmeans.setNumClusters(k);
+        kmeans.buildClusterer(clusterData);
+
+        System.out.println(kmeans);
+
+        int[] clusterCounts = new int[k];
+        for (int i = 0; i < clusterData.numInstances(); i++) {
+            Instance inst = clusterData.instance(i);
+            int cluster = kmeans.clusterInstance(inst);
+            clusterCounts[cluster]++;
+        }
+
+        for (int i = 0; i < k; i++) {
+            System.out.println("Cluster " + i + " size: " + clusterCounts[i]);
+        }
+    }
+}

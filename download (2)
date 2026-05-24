@@ -1,0 +1,67 @@
+package edu.creditrisk;
+
+import weka.core.Instances;
+import weka.core.converters.CSVLoader;
+import weka.core.converters.ArffSaver;
+import java.io.File;
+
+import edu.creditrisk.Preprocessor;
+import edu.creditrisk.SupervisedRunner;
+import edu.creditrisk.ClusterRunner;
+import edu.creditrisk.AsscociationRunner;
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+            // =========================
+            // 1) Load CSV and convert to ARFF
+            // =========================
+            CSVLoader loader = new CSVLoader();
+            loader.setSource(new File("data/credit-g.csv"));
+            Instances data = loader.getDataSet();
+
+            // Optional: save as ARFF for future use
+            ArffSaver saver = new ArffSaver();
+            saver.setInstances(data);
+            saver.setFile(new File("data/credit-g.arff"));
+            saver.writeBatch();
+
+            System.out.println("CSV loaded and ARFF saved successfully!");
+            System.out.println("Number of instances: " + data.numInstances());
+            System.out.println("Number of attributes: " + data.numAttributes());
+
+            // =========================
+            // 2) Preprocessing
+            // =========================
+            data = Preprocessor.replaceMissing(data);
+            data = Preprocessor.stringToNominal(data, "1,2,3"); // adjust indices for categorical columns
+            data = Preprocessor.standardize(data);
+            if (data.classIndex() == -1) data.setClassIndex(data.numAttributes() - 1);
+
+            System.out.println("\nAfter preprocessing:");
+            System.out.println("Number of instances: " + data.numInstances());
+            System.out.println("Class distribution: " + data.attributeStats(data.classIndex()).toString());
+
+            // =========================
+            // 3) Supervised learning
+            // =========================
+            System.out.println("\n=== Supervised Classifier Evaluation ===");
+            SupervisedRunner.evaluateClassifiers(data);
+
+            // =========================
+            // 4) Clustering
+            // =========================
+            System.out.println("\n=== KMeans Clustering ===");
+            ClusterRunner.runKMeans(data, 3);
+
+            // =========================
+            // 5) Association Rule Mining
+            // =========================
+            System.out.println("\n=== Apriori Association Rules ===");
+            AsscociationRunner.runApriori(data);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

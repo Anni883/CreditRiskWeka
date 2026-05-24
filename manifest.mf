@@ -1,0 +1,45 @@
+package edu.creditrisk;
+
+import weka.core.Instances;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.ReplaceMissingValues;
+import weka.filters.unsupervised.attribute.StringToNominal;
+import weka.filters.unsupervised.attribute.Standardize;
+import weka.filters.unsupervised.attribute.Normalize;
+//import weka.filters.supervised.instance.SMOTE;
+
+public class Preprocessor {
+
+    public static Instances replaceMissing(Instances data) throws Exception {
+        ReplaceMissingValues r = new ReplaceMissingValues();
+        r.setInputFormat(data);
+        return Filter.useFilter(data, r);
+    }
+
+    public static Instances stringToNominal(Instances data, String indices) throws Exception {
+        StringToNominal stn = new StringToNominal();
+        stn.setAttributeRange(indices); // e.g., "1,2,3"
+        stn.setInputFormat(data);
+        return Filter.useFilter(data, stn);
+    }
+
+    public static Instances standardize(Instances data) throws Exception {
+        Standardize s = new Standardize();
+        s.setInputFormat(data);
+        return Filter.useFilter(data, s);
+    }
+
+    public static Instances normalize(Instances data) throws Exception {
+        Normalize n = new Normalize();
+        n.setInputFormat(data);
+        return Filter.useFilter(data, n);
+    }
+
+    //public static Instances applySMOTE(Instances data, double percentage, int kNearest) throws Exception {
+      //  SMOTE smote = new SMOTE();
+        //smote.setPercentage(percentage);
+        //smote.setNearestNeighbors(kNearest);
+        //smote.setInputFormat(data);
+        //return Filter.useFilter(data, smote);
+    }
+
